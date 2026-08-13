@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HỆ THỐNG AI — DEMO</title>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#000;color:#eaffef;font-family:Consolas,monospace;overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;filter:brightness(.25) saturate(.9)}
+#shade{position:fixed;inset:0;background:radial-gradient(circle,transparent 0%,rgba(0,0,0,.55) 65%,rgba(0,0,0,.9) 100%),rgba(0,30,10,.25);z-index:-2}
+header{height:64px;border-bottom:2px solid #00ff68;background:rgba(0,8,4,.88);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:0 0 22px #00ff6844}
+.logo{color:#fff;background:#ff0050;padding:5px 12px;font-weight:bold;margin-right:12px}.brand{font-weight:bold}.title{font-size:25px;letter-spacing:5px;text-shadow:0 0 12px #00ff68}
+button{background:#031207;border:1px solid #00ff68;color:#00ff68;padding:9px 15px;border-radius:4px;font-weight:bold;cursor:pointer}
+.wrap{padding:12px;max-width:1500px;margin:auto}.top{display:grid;grid-template-columns:250px 1fr 250px;gap:10px}
+.panel{border:1px solid #23402a;background:rgba(0,7,4,.88);border-radius:8px;box-shadow:inset 0 0 18px #00ff6810,0 0 12px #00ff6810}.side{padding:13px;min-height:500px}.side h3{font-size:13px;color:#00ff68;border-bottom:1px solid #18321f;padding-bottom:9px}.log{font-size:11px;line-height:1.7;padding:4px 0;border-bottom:1px solid #102017}.red{color:#ff174f}.green{color:#00ff68}.yellow{color:#ffe600}
+.main{min-width:0}.duo{display:grid;grid-template-columns:1fr 105px 1fr;gap:15px;align-items:center;margin:45px 45px 22px}.score{border:2px solid;border-radius:12px;padding:15px;background:rgba(0,0,0,.78);transition:.35s;min-height:285px}.con{border-color:#00eaff}.cai{border-color:#ff174f}.score.active.con{box-shadow:0 0 28px #00eaff,0 0 70px #00eaff55}.score.active.cai{box-shadow:0 0 28px #ff174f,0 0 70px #ff174f55}.score h2{text-align:center;font-size:15px;margin:0 0 12px}.con h2{color:#00eaff}.cai h2{color:#ff174f}.line{display:flex;justify-content:space-between;padding:5px 8px;font-size:12px}.line.sel{background:#00eaff;color:#00110b;font-weight:bold}.cai .line.sel{background:#ff174f;color:white}.vs{width:90px;height:90px;border-radius:50%;border:2px solid #00eaff;display:grid;place-items:center;font-size:31px;font-weight:bold;box-shadow:0 0 24px #00eaff55}
+.result{max-width:760px;margin:auto;border:1px solid #20552f;border-radius:16px;background:rgba(0,0,0,.78);padding:20px;text-align:center}.result small{color:#00ff68}.result h1{margin:6px 0 12px;font-size:45px;letter-spacing:4px}.result.con h1{color:#00eaff;text-shadow:0 0 18px #00eaff}.result.cai h1{color:#ff174f;text-shadow:0 0 18px #ff174f}.count{font-size:14px;color:#b8cbbd}.timer{font-size:26px;color:#fff;margin-top:6px}.status{margin:15px auto 0;padding:8px;border:1px solid #23402a;border-radius:8px;max-width:430px}
+.history{margin-top:12px;padding:10px}.history h3{color:#00ff68;font-size:13px}.histrow{display:grid;grid-template-columns:80px 1fr 100px;border-bottom:1px solid #18321f;padding:7px;font-size:12px}.pill{display:inline-block;padding:3px 10px;border-radius:12px;color:#fff;font-weight:bold}.pill.con{background:#008ed1}.pill.cai{background:#df1747}
+@media(max-width:1000px){.top{grid-template-columns:1fr}.side{min-height:auto}.duo{margin:20px 5px;grid-template-columns:1fr}.vs{margin:auto}.title{font-size:15px}}
+</style>
+</head>
+<body>
+<video id="bg" autoplay muted loop playsinline><source src="hacker_background.mp4" type="video/mp4"></video>
+<div id="shade"></div>
+<header><div><span class="logo">DEMO</span><span class="brand">// HỆ THỐNG AI V2.0</span></div><div class="title">BÀN BACCARAT 1</div><button onclick="start()">BẮT ĐẦU</button></header>
+
+<div class="wrap"><div class="top">
+<aside class="panel side"><h3>&gt;&gt; NHẬT KÝ HỆ THỐNG</h3><div id="logs"></div></aside>
+
+<main class="main">
+<div class="duo">
+<section id="conBox" class="score con"><h2>AI MÔ PHỎNG CON</h2><div id="conRows"></div></section>
+<div class="vs">VS</div>
+<section id="caiBox" class="score cai"><h2>AI MÔ PHỎNG CÁI</h2><div id="caiRows"></div></section>
+</div>
+
+<section id="result" class="result con">
+<small>HỆ THỐNG MÔ PHỎNG</small>
+<h1 id="winner">CON THẮNG</h1>
+<div class="count">Lượt tiếp theo sau</div><div class="timer" id="timer">10s</div>
+<div class="status" id="status">Đang chờ bắt đầu...</div>
+</section>
+
+<section class="panel history"><h3>LỊCH SỬ PHÁN ĐOÁN</h3><div id="history"></div></section>
+</main>
+
+<aside class="panel side"><h3>STATUS: <span class="green">SECURE_LINK</span></h3><div class="log red">&gt;&gt; ĐÂY LÀ DEMO, KẾT QUẢ NGẪU NHIÊN</div><div id="terminal"></div></aside>
+</div></div>
+
+<script>
+let timer=10, running=false, interval=null, round=0;
+const voicesText="Chào mừng Boss Kiên và Nguyên";
+function speak(){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(voicesText); u.lang="vi-VN"; u.rate=.92; u.pitch=1;
+  speechSynthesis.speak(u);
+}
+function rows(id,active){
+ const a=[6,8,7,10,12,15,18,9,7,5];
+ document.getElementById(id).innerHTML=a.map((v,i)=>`<div class="line ${i===active?'sel':''}"><span>ĐIỂM ${i}</span><b>${v}%</b></div>`).join("");
+}
+function log(msg,cls="green"){
+ const box=document.getElementById("logs");
+ box.innerHTML=`<div class="log ${cls}">[${new Date().toLocaleTimeString()}] &gt;&gt; ${msg}</div>`+box.innerHTML;
+}
+function terminal(){
+ document.getElementById("terminal").innerHTML=[
+ "QUÉT DỮ LIỆU BÀN... [F6A7]","KIỂM TRA KẾT NỐI... [C999]",
+ "TÍNH TOÁN GIAO DIỆN... [D3EE]","MODULE DEMO: ONLINE [D696]",
+ "CHỜ LƯỢT TIẾP THEO... [B3E6]"
+ ].map(x=>`<div class="log green">&gt; ${x}</div>`).join("");
+}
+function predict(){
+ const con=Math.random()<.5;
+ const rb=document.getElementById("result"), cb=document.getElementById("conBox"), kb=document.getElementById("caiBox");
+ cb.classList.toggle("active",con); kb.classList.toggle("active",!con);
+ rb.className="result "+(con?"con":"cai");
+ document.getElementById("winner").textContent=con?"CON THẮNG":"CÁI THẮNG";
+ document.getElementById("status").textContent=con?"Ô CON ĐANG SÁNG — MÀU XANH":"Ô CÁI ĐANG SÁNG — MÀU ĐỎ";
+ rows("conRows",con?6:3); rows("caiRows",con?3:6);
+ round++;
+ const h=document.getElementById("history");
+ h.innerHTML=`<div class="histrow"><span>#${round}</span><span><span class="pill ${con?'con':'cai'}">${con?"CON THẮNG":"CÁI THẮNG"}</span></span><span>10 giây</span></div>`+h.innerHTML;
+ log(con?"PHÁN ĐOÁN: CON THẮNG":"PHÁN ĐOÁN: CÁI THẮNG",con?"green":"red");
+ terminal();
+ timer=10;
+}
+function tick(){
+ if(!running)return;
+ timer--; document.getElementById("timer").textContent=timer+"s";
+ if(timer<=0) predict();
+}
+function start(){
+ if(running)return;
+ running=true;speak();predict();
+ clearInterval(interval);interval=setInterval(tick,1000);
+ document.getElementById("status").textContent="Đã chạy — tự mô phỏng mỗi 10 giây";
+ log("BẮT ĐẦU HỆ THỐNG DEMO","green");
+}
+rows("conRows",6);rows("caiRows",6);terminal();
+</script>
+</body></html>
